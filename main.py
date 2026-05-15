@@ -2,6 +2,9 @@ import pandas
 
 df = pandas.read_csv("hotels.csv", dtype={"id":str})
 
+# Loading the dataframe as a dictionary
+df_cards = pandas.read_csv("fake_cards.csv", dtype=str).to_dict(orient="records")
+
 class Hotel:
     def __init__(self, hotel_id):
         self.hotel_id = hotel_id
@@ -35,14 +38,32 @@ class ReservationTicket:
         """
         return content
 
+class CreditCard:
+    def __init__(self, number):
+        self.number = number
+
+    def validate(self, expiration, holder, cvc):
+        card_data = {"number":self.number, "expiration":expiration,
+                     "holder":holder, "cvc":cvc}
+        if card_data in df_cards:
+            return True
+        else:
+            return False
+
 print(df)
 hotel_id = input("Enter the id of the hotel: ")
 hotel = Hotel(hotel_id)
 
 if hotel.available():
-    hotel.book()
-    name = input("Enter your name: ")
-    reservation_ticket = ReservationTicket(customer_name = name, hotel_object = hotel)
-    print(reservation_ticket.generate())
+    # What is the minimum number of parameters needed when defining an instance?
+    # - Design the class around that, CreditCard in this case.
+    credit_card = CreditCard(number="1234567897676767")
+    if credit_card.validate(expiration="12/26", holder="JOHN SMITH", cvc="123"):
+        hotel.book()
+        name = input("Enter your name: ")
+        reservation_ticket = ReservationTicket(customer_name = name, hotel_object = hotel)
+        print(reservation_ticket.generate())
+    else:
+        print("There was a problem with your payment.")
 else:
     print("Hotel is not available.")
